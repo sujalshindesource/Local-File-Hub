@@ -1,14 +1,16 @@
 
 
-
-//match3 with again scrollbar 
 import React, { useState } from 'react';
-import { Search, Bell, Upload, Home, Share2, Trash2, List, Grid } from 'lucide-react';
+import { Search, Bell, Upload, Home, Share2, Trash2, List, Grid, FolderOpen } from 'lucide-react';
 
 const FileHubUI = () => {
   const [viewMode, setViewMode] = useState('grid');
+  const [myFiles, setMyFiles] = useState([]);
+  const [myFileFetch, setMyFileFetch] = useState(false);
+  const [selectedFolderPath, setSelectedFolderPath] = useState('');
 
-  const files = [
+  // Default files when no folder is selected
+  const defaultFiles = [
     {
       id: 1,
       name: 'Project Alpha Report',
@@ -64,269 +66,224 @@ const FileHubUI = () => {
       size: '50MB',
       date: '2024-06-01',
       color: 'bg-danger'
-    },
-    {
-      id: 9,
-      name: 'Budget Analysis 2024',
-      size: '12MB',
-      date: '2024-05-25',
-      color: 'bg-info'
-    },
-    {
-      id: 10,
-      name: 'User Research Data',
-      size: '85MB',
-      date: '2024-05-20',
-      color: 'bg-success'
-    },
-    {
-      id: 11,
-      name: 'Product Roadmap',
-      size: '18MB',
-      date: '2024-05-15',
-      color: 'bg-warning'
-    },
-    {
-      id: 12,
-      name: 'Performance Metrics',
-      size: '32MB',
-      date: '2024-05-10',
-      color: 'bg-danger'
-    },
-    {
-      id: 13,
-      name: 'Marketing Assets',
-      size: '75MB',
-      date: '2024-05-05',
-      color: 'bg-info'
-    },
-    {
-      id: 14,
-      name: 'Technical Documentation',
-      size: '45MB',
-      date: '2024-05-01',
-      color: 'bg-success'
-    },
-    {
-      id: 15,
-      name: 'Sales Report Q1',
-      size: '28MB',
-      date: '2024-04-28',
-      color: 'bg-primary'
-    },
-    {
-      id: 16,
-      name: 'Employee Handbook',
-      size: '65MB',
-      date: '2024-04-25',
-      color: 'bg-warning'
     }
   ];
 
-  return (
-    <div className="vh-100 d-flex flex-column" style={{ backgroundColor: '#1a4d3a' }}>
-      {/* Desktop Layout */}
-      <div className="d-none d-md-flex flex-fill overflow-hidden">
-        {/* Sidebar - Desktop */}
-        <div className="bg-dark text-white p-3 d-flex flex-column" style={{ width: '250px', backgroundColor: '#0f2d1f !important', minHeight: '0' }}>
-          {/* Logo */}
-          <div className="d-flex align-items-center mb-4">
-            <div className="me-2" style={{ fontSize: '1.2rem' }}>📁</div>
-            <h5 className="mb-0 fw-bold">FileX</h5>
+  // Handle folder fetch/drop
+  const handleFetchDrop = async () => {
+    if (myFileFetch) {
+      // Drop current folder
+      setMyFiles([]);
+      setSelectedFolderPath('');
+      setMyFileFetch(false);
+    } else {
+      // Fetch new folder
+      try {
+        // For web version, we'll use directory picker API (modern browsers)
+        if ('showDirectoryPicker' in window) {
+          const dirHandle = await window.showDirectoryPicker();
+          const files = await scanDirectory(dirHandle);
+          setMyFiles(files);
+          setSelectedFolderPath(dirHandle.name);
+          setMyFileFetch(true);
+        } else {
+          // Fallback: Use file input for folder selection
+          const input = document.createElement('input');
+          input.type = 'file';
+          input.webkitdirectory = true;
+          input.multiple = true;
+          input.onchange = (e) => {
+            const files = Array.from(e.target.files).map((file, index) => ({
+              id: index + 1,
+              name: file.name,
+              size: formatFileSize(file.size),
+              date: new Date(file.lastModified).toISOString().split('T')[0],
+              color: getRandomColor(),
+              file: file
+            }));
+            setMyFiles(files);
+            setSelectedFolderPath(files[0]?.file.webkitRelativePath.split('/')[0] || 'Selected Folder');
+            setMyFileFetch(true);
+          };
+          input.click();
+        }
+      } catch (error) {
+        console.log('User cancelled folder selection');
+      }
+    }
+  };
+
+  // Scan directory using File System Access API
+  const scanDirectory = async (dirHandle) => {
+    const files = [];
+    let id = 1;
+    
+    for await (const entry of dirHandle.values()) {
+      if (entry.kind === 'file') {
+        const file = await entry.getFile();
+        files.push({
+          id: id++,
+          name: file.name,
+          size: formatFileSize(file.size),
+          date: new Date(file.lastModified).toISOString().split('T')[0],
+          color: getRandomColor(),
+          file: file
+        });
+      }
+    }
+    return files;
+  };
+
+  // Helper functions
+  const formatFileSize = (bytes) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+  };
+
+  const getRandomColor = () => {
+    const colors = ['bg-warning', 'bg-primary', 'bg-danger', 'bg-info', 'bg-success', 'bg-secondary'];
+    return colors[Math.floor(Math.random() * colors.length)];
+  };
+
+  // Get files to display
+  const filesToDisplay = myFileFetch ? myFiles : defaultFiles;
+
+  // Reusable components
+  const FileCard = ({ file, isMobile = false }) => {
+    const cardSize = isMobile ? { width: '40px', height: '50px', iconW: '24px', iconH: '28px' } 
+                              : { width: '60px', height: '75px', iconW: '60px', iconH: '75px' };
+    
+    return (
+      <div 
+        className="card h-100 border-0 shadow-sm"
+        style={{ backgroundColor: '#2d5a3d', cursor: 'pointer' }}
+      >
+        <div className={`card-body ${isMobile ? 'p-3' : 'p-4'}`}>
+          {/* File Icon Container */}
+          <div 
+            className={`${file.color} rounded-3 d-flex align-items-center justify-content-center mb-3`}
+            style={{ height: isMobile ? '80px' : '120px', opacity: '0.9' }}
+          >
+            <div 
+              className="bg-white rounded shadow"
+              style={{ 
+                width: cardSize.iconW, 
+                height: cardSize.iconH,
+                display: 'flex',
+                flexDirection: 'column',
+                padding: isMobile ? '6px' : '8px'
+              }}
+            >
+              {/* Document lines */}
+              <div style={{ height: isMobile ? '2px' : '3px', backgroundColor: '#ccc', marginBottom: isMobile ? '3px' : '4px' }}></div>
+              <div style={{ height: isMobile ? '2px' : '3px', backgroundColor: '#ccc', marginBottom: isMobile ? '3px' : '4px' }}></div>
+              <div style={{ height: isMobile ? '2px' : '3px', backgroundColor: '#ccc', marginBottom: isMobile ? '3px' : '4px' }}></div>
+              {!isMobile && <div style={{ height: '3px', backgroundColor: '#ccc', marginBottom: '4px' }}></div>}
+              {!isMobile && <div style={{ height: '3px', backgroundColor: '#ccc', marginBottom: '4px' }}></div>}
+              <div style={{ height: isMobile ? '2px' : '3px', backgroundColor: '#ccc', width: '60%' }}></div>
+            </div>
           </div>
-
-          {/* Navigation */}
-          <nav className="nav flex-column">
-            <a href="#" className="nav-link text-white d-flex align-items-center py-3 px-3 rounded mb-2  bg-success" style={{ backgroundColor: '#2d5a3d' }}>
-              <Home size={18} className="me-3" />
-              Home
-            </a>
-            {/* <a href="#" className="nav-link text-white d-flex align-items-center py-3 px-3 rounded mb-2 bg-success">
-              <div className="me-3" style={{ width: '18px', height: '18px' }}>📄</div>
-              My Files
-            </a> */}
-            <a href="#" className="nav-link text-white d-flex align-items-center py-3 px-3 rounded mb-2">
-              <Share2 size={18} className="me-3" />
-              Shared
-            </a>
-            <a href="#" className="nav-link text-white d-flex align-items-center py-3 px-3 rounded mb-2">
-              <Trash2 size={18} className="me-3" />
-              Trash
-            </a>
-          </nav>
-        </div>
-
-        {/* Main Content - Desktop */}
-        <div className="flex-fill d-flex flex-column overflow-hidden" style={{ minHeight: '0' }}>
-          {/* Header */}
-          <header className="d-flex justify-content-between align-items-center p-3 border-bottom flex-shrink-0" style={{ backgroundColor: '#1a4d3a', borderColor: '#2d5a3d !important' }}>
-            <div className="flex-fill mx-3" style={{ maxWidth: '400px' }}>
-              <div className="input-group">
-                <span className="input-group-text bg-dark border-0" style={{ color: '#8a9a8a' }}>
-                  <Search size={18} />
-                </span>
-                <input
-                  type="text"
-                  className="form-control bg-dark border-0 text-white"
-                  placeholder="Search"
-                  style={{ backgroundColor: '#2d5a3d !important' }}
-                />
-              </div>
-            </div>
-            <div className="d-flex align-items-center">
-              <button className="btn btn-link text-white me-3 p-2">
-                <Bell size={20} />
-              </button>
-              <div className="rounded-circle d-flex align-items-center justify-content-center" 
-                   style={{ width: '40px', height: '40px', backgroundColor: '#ff6b6b' }}>
-                <span className="text-white fw-bold">👤</span>
-              </div>
-            </div>
-          </header>
-
-          {/* Content Area with Scroll */}
-          <main className="flex-fill p-4 overflow-auto" style={{ backgroundColor: '#1a4d3a', minHeight: '0' }}>
-            {/* Page Header */}
-            <div className="d-flex justify-content-between align-items-center mb-4">
-              <h2 className="text-white mb-0">My Files</h2>
-              <button className="btn btn-success">
-                <Upload size={18} className="me-2" />
-                Upload
-              </button>
-            </div>
-
-            {/* View Controls */}
-            <div className="d-flex mb-4">
-              <button
-                className={`btn me-2 ${viewMode === 'list' ? 'btn-success' : 'btn-outline-light'}`}
-                onClick={() => setViewMode('list')}
-              >
-                <List size={18} />
-              </button>
-              <button
-                className={`btn ${viewMode === 'grid' ? 'btn-success' : 'btn-outline-light'}`}
-                onClick={() => setViewMode('grid')}
-              >
-                <Grid size={18} />
-              </button>
-            </div>
-
-            {/* Files Display */}
-            {viewMode === 'grid' ? (
-              /* Grid View */
-              <div className="row g-3">
-                {files.map((file) => (
-                  <div key={file.id} className="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12">
-                    < 
-                      div 
-                      className="card h-100 border-0 shadow-sm"
-                      style={{ backgroundColor: '#2d5a3d', cursor: 'pointer' }}
-                    >
-                      <div className="card-body p-4">
-                        {/* File Icon Container */}
-                        <div 
-                          className={`${file.color} rounded-3 d-flex align-items-center justify-content-center mb-3`}
-                          style={{ height: '120px', opacity: '0.9' }}
-                        >
-                          <div 
-                            className="bg-white rounded shadow"
-                            style={{ 
-                              width: '60px', 
-                              height: '75px',
-                              position: 'relative',
-                              display: 'flex',
-                              flexDirection: 'column',
-                              padding: '8px'
-                            }}
-                          >
-                            {/* Document lines */}
-                            <div style={{ height: '3px', backgroundColor: '#ccc', marginBottom: '4px' }}></div>
-                            <div style={{ height: '3px', backgroundColor: '#ccc', marginBottom: '4px' }}></div>
-                            <div style={{ height: '3px', backgroundColor: '#ccc', marginBottom: '4px' }}></div>
-                            <div style={{ height: '3px', backgroundColor: '#ccc', marginBottom: '4px' }}></div>
-                            <div style={{ height: '3px', backgroundColor: '#ccc', marginBottom: '4px' }}></div>
-                            <div style={{ height: '3px', backgroundColor: '#ccc', width: '60%' }}></div>
-                          </div>
-                        </div>
-                        
-                        {/* File Info */}
-                        <h6 className="card-title text-white mb-2 fw-semibold" style={{ fontSize: '0.9rem' }}>
-                          {file.name}
-                        </h6>
-                        <div className="d-flex justify-content-between align-items-center">
-                          <small className="text-muted">{file.size}</small>
-                          <small className="text-muted">{file.date}</small>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              /* List View */
-              <div className="list-group">
-                {files.map((file) => (
-                  <div 
-                    key={file.id} 
-                    className="list-group-item d-flex align-items-center p-3 mb-2 border-0"
-                    style={{ backgroundColor: '#2d5a3d', cursor: 'pointer' }}
-                  >
-                    {/* File Icon */}
-                    <div 
-                      className={`${file.color} rounded d-flex align-items-center justify-content-center me-3`}
-                      style={{ width: '50px', height: '50px', minWidth: '50px', opacity: '0.9' }}
-                    >
-                      <div 
-                        className="bg-white rounded shadow"
-                        style={{ 
-                          width: '30px', 
-                          height: '35px',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          padding: '4px'
-                        }}
-                      >
-                        <div style={{ height: '2px', backgroundColor: '#ccc', marginBottom: '2px' }}></div>
-                        <div style={{ height: '2px', backgroundColor: '#ccc', marginBottom: '2px' }}></div>
-                        <div style={{ height: '2px', backgroundColor: '#ccc', marginBottom: '2px' }}></div>
-                        <div style={{ height: '2px', backgroundColor: '#ccc', width: '60%' }}></div>
-                      </div>
-                    </div>
-                    
-                    {/* File Details */}
-                    <div className="flex-fill">
-                      <h6 className="mb-1 text-white fw-semibold">{file.name}</h6>
-                      <div className="d-flex">
-                        <small className="text-muted me-3">{file.size}</small>
-                        <small className="text-muted">{file.date}</small>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </main>
+          
+          {/* File Info */}
+          <h6 className="card-title text-white mb-2 fw-semibold" style={{ fontSize: isMobile ? '0.8rem' : '0.9rem' }}>
+            {isMobile && file.name.length > 20 ? file.name.substring(0, 20) + '...' : file.name}
+          </h6>
+          <div className="d-flex justify-content-between align-items-center">
+            <small className="text-muted" style={{ fontSize: isMobile ? '0.7rem' : '0.8rem' }}>{file.size}</small>
+            <small className="text-muted" style={{ fontSize: isMobile ? '0.7rem' : '0.8rem' }}>
+              {isMobile ? file.date.substring(5) : file.date}
+            </small>
+          </div>
         </div>
       </div>
+    );
+  };
 
-      {/* Mobile Layout */}
-      <div className="d-md-none d-flex flex-column h-100">
-        {/* Header - Mobile */}
-        <header className="d-flex justify-content-between align-items-center p-3 border-bottom flex-shrink-0" style={{ backgroundColor: '#1a4d3a', borderColor: '#2d5a3d !important' }}>
-          <h5 className="text-white mb-0 fw-bold">FileX</h5>
-          <div className="d-flex align-items-center">
-            <button className="btn btn-link text-white me-2 p-2">
-              <Bell size={20} />
-            </button>
-            <div className="rounded-circle d-flex align-items-center justify-content-center" 
-                 style={{ width: '35px', height: '35px', backgroundColor: '#ff6b6b' }}>
-              <span className="text-white fw-bold">👤</span>
-            </div>
+  const FileListItem = ({ file, isMobile = false }) => {
+    const iconSize = isMobile ? '40px' : '50px';
+    const iconInnerSize = isMobile ? { w: '24px', h: '28px' } : { w: '30px', h: '35px' };
+    
+    return (
+      <div 
+        className="list-group-item d-flex align-items-center mb-2 border-0"
+        style={{ backgroundColor: '#2d5a3d', cursor: 'pointer', padding: isMobile ? '8px' : '12px' }}
+      >
+        {/* File Icon */}
+        <div 
+          className={`${file.color} rounded d-flex align-items-center justify-content-center me-3`}
+          style={{ width: iconSize, height: iconSize, minWidth: iconSize, opacity: '0.9' }}
+        >
+          <div 
+            className="bg-white rounded shadow"
+            style={{ 
+              width: iconInnerSize.w, 
+              height: iconInnerSize.h,
+              display: 'flex',
+              flexDirection: 'column',
+              padding: isMobile ? '3px' : '4px'
+            }}
+          >
+            <div style={{ height: '2px', backgroundColor: '#ccc', marginBottom: '2px' }}></div>
+            <div style={{ height: '2px', backgroundColor: '#ccc', marginBottom: '2px' }}></div>
+            <div style={{ height: '2px', backgroundColor: '#ccc', marginBottom: '2px' }}></div>
+            <div style={{ height: '2px', backgroundColor: '#ccc', width: '60%' }}></div>
           </div>
-        </header>
+        </div>
+        
+        {/* File Details */}
+        <div className="flex-fill">
+          <h6 className="mb-1 text-white fw-semibold" style={{ fontSize: isMobile ? '0.85rem' : '1rem' }}>
+            {file.name}
+          </h6>
+          <div className="d-flex">
+            <small className="text-muted me-3" style={{ fontSize: isMobile ? '0.75rem' : '0.8rem' }}>{file.size}</small>
+            <small className="text-muted" style={{ fontSize: isMobile ? '0.75rem' : '0.8rem' }}>{file.date}</small>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
-        {/* Search Bar - Mobile */}
-        <div className="p-3 flex-shrink-0" style={{ backgroundColor: '#1a4d3a' }}>
+  const Sidebar = ({ isMobile = false }) => (
+    <nav className={`nav ${isMobile ? 'd-flex' : 'flex-column'}`}>
+      <a href="#" className={`nav-link text-white d-flex align-items-center rounded mb-2 bg-success ${
+        isMobile ? 'flex-fill text-center py-3 text-decoration-none' : 'py-3 px-3'
+      }`} style={{ backgroundColor: isMobile ? '#2d5a3d' : '#2d5a3d' }}>
+        <Home size={isMobile ? 20 : 18} className={isMobile ? 'd-block mx-auto mb-1' : 'me-3'} />
+        {isMobile ? <small>Home</small> : 'Home'}
+      </a>
+      <a href="#" className={`nav-link text-white d-flex align-items-center rounded mb-2 ${
+        isMobile ? 'flex-fill text-center py-3 text-decoration-none' : 'py-3 px-3'
+      }`}>
+        <Share2 size={isMobile ? 20 : 18} className={isMobile ? 'd-block mx-auto mb-1' : 'me-3'} />
+        {isMobile ? <small>Shared</small> : 'Shared'}
+      </a>
+      <a href="#" className={`nav-link text-white d-flex align-items-center rounded mb-2 ${
+        isMobile ? 'flex-fill text-center py-3 text-decoration-none' : 'py-3 px-3'
+      }`}>
+        <Trash2 size={isMobile ? 20 : 18} className={isMobile ? 'd-block mx-auto mb-1' : 'me-3'} />
+        {isMobile ? <small>Trash</small> : 'Trash'}
+      </a>
+    </nav>
+  );
+
+  return (
+    <div className="vh-100 d-flex flex-column" style={{ backgroundColor: '#1a4d3a' }}>
+      {/* Header - Always visible */}
+      <header className="d-flex justify-content-between align-items-center p-3 border-bottom flex-shrink-0" 
+              style={{ backgroundColor: '#1a4d3a', borderColor: '#2d5a3d !important' }}>
+        {/* Logo - visible on all screens */}
+        <div className="d-flex align-items-center">
+          <div className="me-2" style={{ fontSize: '1.2rem' }}>📁</div>
+          <h5 className="mb-0 fw-bold text-white d-none d-md-block">FileX</h5>
+          <h5 className="mb-0 fw-bold text-white d-md-none">FileX</h5>
+        </div>
+
+        {/* Search Bar - hidden on mobile, will be separate section */}
+        <div className="flex-fill mx-3 d-none d-md-block" style={{ maxWidth: '400px' }}>
           <div className="input-group">
             <span className="input-group-text bg-dark border-0" style={{ color: '#8a9a8a' }}>
               <Search size={18} />
@@ -340,146 +297,137 @@ const FileHubUI = () => {
           </div>
         </div>
 
-        {/* Content Area - Mobile */}
-        <main className="flex-fill p-3 overflow-auto" style={{ backgroundColor: '#1a4d3a', minHeight: '0' }}>
+        {/* Profile section */}
+        <div className="d-flex align-items-center">
+          <button className="btn btn-link text-white me-3 p-2">
+            <Bell size={20} />
+          </button>
+          <div className="rounded-circle d-flex align-items-center justify-content-center" 
+               style={{ width: '40px', height: '40px', backgroundColor: '#ff6b6b' }}>
+            <span className="text-white fw-bold">👤</span>
+          </div>
+        </div>
+      </header>
+
+      {/* Mobile Search Bar */}
+      <div className="d-md-none p-3 flex-shrink-0" style={{ backgroundColor: '#1a4d3a' }}>
+        <div className="input-group">
+          <span className="input-group-text bg-dark border-0" style={{ color: '#8a9a8a' }}>
+            <Search size={18} />
+          </span>
+          <input
+            type="text"
+            className="form-control bg-dark border-0 text-white"
+            placeholder="Search"
+            style={{ backgroundColor: '#2d5a3d !important' }}
+          />
+        </div>
+      </div>
+
+      {/* Main Content Area */}
+      <div className="flex-fill d-flex overflow-hidden">
+        {/* Desktop Sidebar */}
+        <div className="d-none d-md-flex bg-dark text-white p-3 flex-column" 
+             style={{ width: '250px', backgroundColor: '#0f2d1f !important' }}>
+          {/* Navigation */}
+          <Sidebar />
+        </div>
+
+        {/* Content Area */}
+        <main className="flex-fill p-4 overflow-auto d-flex flex-column" style={{ backgroundColor: '#1a4d3a', minHeight: '0' }}>
           {/* Page Header */}
-          <div className="d-flex justify-content-between align-items-center mb-3">
-            <h4 className="text-white mb-0">My Files</h4>
-            <button className="btn btn-success btn-sm">
-              <Upload size={16} className="me-1" />
-              Upload
-            </button>
+          <div className="d-flex justify-content-between align-items-center mb-4 flex-shrink-0">
+            <div>
+              <h2 className="text-white mb-0 d-none d-md-block">My Files</h2>
+              <h4 className="text-white mb-0 d-md-none">My Files</h4>
+              {selectedFolderPath && (
+                <small className="text-muted d-block mt-1">
+                  <FolderOpen size={14} className="me-1" />
+                  {selectedFolderPath}
+                </small>
+              )}
+            </div>
+            <div className="d-flex gap-2">
+              <button className="btn btn-success btn-sm d-md-none">
+                <Upload size={16} className="me-1" />
+                Upload
+              </button>
+              <button className="btn btn-success d-none d-md-block">
+                <Upload size={18} className="me-2" />
+                Upload
+              </button>
+              <button 
+                className={`btn btn-outline-info ${myFileFetch ? 'btn-info text-white' : ''} btn-sm d-md-none`}
+                onClick={handleFetchDrop}
+              >
+                <FolderOpen size={16} className="me-1" />
+                {myFileFetch ? 'Drop' : 'Fetch'}
+              </button>
+              <button 
+                className={`btn btn-outline-info ${myFileFetch ? 'btn-info text-white' : ''} d-none d-md-block`}
+                onClick={handleFetchDrop}
+              >
+                <FolderOpen size={18} className="me-2" />
+                {myFileFetch ? 'Drop' : 'Fetch'}
+              </button>
+            </div>
           </div>
 
           {/* View Controls */}
-          <div className="d-flex mb-3">
+          <div className="d-flex mb-4 flex-shrink-0">
             <button
-              className={`btn btn-sm me-2 ${viewMode === 'list' ? 'btn-success' : 'btn-outline-light'}`}
+              className={`btn me-2 btn-sm d-md-none ${viewMode === 'list' ? 'btn-success' : 'btn-outline-light'}`}
               onClick={() => setViewMode('list')}
             >
               <List size={16} />
             </button>
             <button
-              className={`btn btn-sm ${viewMode === 'grid' ? 'btn-success' : 'btn-outline-light'}`}
+              className={`btn btn-sm d-md-none ${viewMode === 'grid' ? 'btn-success' : 'btn-outline-light'}`}
               onClick={() => setViewMode('grid')}
             >
               <Grid size={16} />
             </button>
+            <button
+              className={`btn me-2 d-none d-md-block ${viewMode === 'list' ? 'btn-success' : 'btn-outline-light'}`}
+              onClick={() => setViewMode('list')}
+            >
+              <List size={18} />
+            </button>
+            <button
+              className={`btn d-none d-md-block ${viewMode === 'grid' ? 'btn-success' : 'btn-outline-light'}`}
+              onClick={() => setViewMode('grid')}
+            >
+              <Grid size={18} />
+            </button>
           </div>
 
-          {/* Files Display - Mobile */}
-          {viewMode === 'grid' ? (
-            /* Grid View - Mobile (2 columns) */
-            <div className="row g-2">
-              {files.map((file) => (
-                <div key={file.id} className="col-6">
-                  <div 
-                    className="card h-100 border-0 shadow-sm"
-                    style={{ backgroundColor: '#2d5a3d', cursor: 'pointer' }}
-                  >
-                    <div className="card-body p-3">
-                      {/* File Icon Container */}
-                      <div 
-                        className={`${file.color} rounded d-flex align-items-center justify-content-center mb-2`}
-                        style={{ height: '80px', opacity: '0.9' }}
-                      >
-                        <div 
-                          className="bg-white rounded shadow"
-                          style={{ 
-                            width: '40px', 
-                            height: '50px',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            padding: '6px'
-                          }}
-                        >
-                          <div style={{ height: '2px', backgroundColor: '#ccc', marginBottom: '3px' }}></div>
-                          <div style={{ height: '2px', backgroundColor: '#ccc', marginBottom: '3px' }}></div>
-                          <div style={{ height: '2px', backgroundColor: '#ccc', marginBottom: '3px' }}></div>
-                          <div style={{ height: '2px', backgroundColor: '#ccc', width: '60%' }}></div>
-                        </div>
-                      </div>
-                      
-                      {/* File Info */}
-                      <h6 className="card-title text-white mb-1 fw-semibold" style={{ fontSize: '0.8rem' }}>
-                        {file.name.length > 20 ? file.name.substring(0, 20) + '...' : file.name}
-                      </h6>
-                      <div className="d-flex justify-content-between align-items-center">
-                        <small className="text-muted" style={{ fontSize: '0.7rem' }}>{file.size}</small>
-                        <small className="text-muted" style={{ fontSize: '0.7rem' }}>
-                          {file.date.substring(5)}
-                        </small>
-                      </div>
-                    </div>
+          {/* Files Display */}
+          <div className="flex-fill overflow-auto">
+            {viewMode === 'grid' ? (
+              /* Grid View - Responsive */
+              <div className="row g-3 g-md-3">
+                {filesToDisplay.map((file) => (
+                  <div key={file.id} className="col-6 col-sm-6 col-md-6 col-lg-4 col-xl-3">
+                    <FileCard file={file} isMobile={window.innerWidth < 768} />
                   </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            /* List View - Mobile */
-            <div className="list-group">
-              {files.map((file) => (
-                <div 
-                  key={file.id} 
-                  className="list-group-item d-flex align-items-center p-2 mb-2 border-0"
-                  style={{ backgroundColor: '#2d5a3d', cursor: 'pointer' }}
-                >
-                  {/* File Icon */}
-                  <div 
-                    className={`${file.color} rounded d-flex align-items-center justify-content-center me-3`}
-                    style={{ width: '40px', height: '40px', minWidth: '40px', opacity: '0.9' }}
-                  >
-                    <div 
-                      className="bg-white rounded shadow"
-                      style={{ 
-                        width: '24px', 
-                        height: '28px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        padding: '3px'
-                      }}
-                    >
-                      <div style={{ height: '2px', backgroundColor: '#ccc', marginBottom: '2px' }}></div>
-                      <div style={{ height: '2px', backgroundColor: '#ccc', marginBottom: '2px' }}></div>
-                      <div style={{ height: '2px', backgroundColor: '#ccc', width: '60%' }}></div>
-                    </div>
-                  </div>
-                  
-                  {/* File Details */}
-                  <div className="flex-fill">
-                    <h6 className="mb-1 text-white fw-semibold" style={{ fontSize: '0.85rem' }}>
-                      {file.name}
-                    </h6>
-                    <div className="d-flex">
-                      <small className="text-muted me-3" style={{ fontSize: '0.75rem' }}>{file.size}</small>
-                      <small className="text-muted" style={{ fontSize: '0.75rem' }}>{file.date}</small>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            ) : (
+              /* List View - Responsive */
+              <div className="list-group">
+                {filesToDisplay.map((file) => (
+                  <FileListItem key={file.id} file={file} isMobile={window.innerWidth < 768} />
+                ))}
+              </div>
+            )}
+          </div>
         </main>
+      </div>
 
-        {/* Bottom Navigation - Mobile */}
-        <nav className="bg-dark border-top d-flex flex-shrink-0" style={{ backgroundColor: '#0f2d1f !important', borderColor: '#2d5a3d !important' }}>
-          <a href="#" className="flex-fill text-center text-white py-3 text-decoration-none" style={{ backgroundColor: '#2d5a3d' }}>
-            <Home size={20} className="d-block mx-auto mb-1" />
-            <small>Home</small>
-          </a>
-          <a href="#" className="flex-fill text-center text-white py-3 text-decoration-none bg-success">
-            <div className="d-block mx-auto mb-1" style={{ width: '20px', height: '20px' }}>📄</div>
-            <small>My Files</small>
-          </a>
-          <a href="#" className="flex-fill text-center text-white py-3 text-decoration-none">
-            <Share2 size={20} className="d-block mx-auto mb-1" />
-            <small>Shared</small>
-          </a>
-          <a href="#" className="flex-fill text-center text-white py-3 text-decoration-none">
-            <Trash2 size={20} className="d-block mx-auto mb-1" />
-            <small>Trash</small>
-          </a>
-        </nav>
+      {/* Mobile Bottom Navigation */}
+      <div className="d-md-none bg-dark border-top flex-shrink-0" 
+           style={{ backgroundColor: '#0f2d1f !important', borderColor: '#2d5a3d !important' }}>
+        <Sidebar isMobile={true} />
       </div>
     </div>
   );
