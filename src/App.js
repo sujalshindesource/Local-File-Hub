@@ -1,5 +1,7 @@
 
-// match 2 with solution 
+
+
+//match3 with again scrollbar 
 import React, { useState } from 'react';
 import { Search, Bell, Upload, Home, Share2, Trash2, List, Grid } from 'lucide-react';
 
@@ -63,7 +65,6 @@ const FileHubUI = () => {
       date: '2024-06-01',
       color: 'bg-danger'
     },
-    // Adding more files to test scrolling
     {
       id: 9,
       name: 'Budget Analysis 2024',
@@ -91,15 +92,43 @@ const FileHubUI = () => {
       size: '32MB',
       date: '2024-05-10',
       color: 'bg-danger'
+    },
+    {
+      id: 13,
+      name: 'Marketing Assets',
+      size: '75MB',
+      date: '2024-05-05',
+      color: 'bg-info'
+    },
+    {
+      id: 14,
+      name: 'Technical Documentation',
+      size: '45MB',
+      date: '2024-05-01',
+      color: 'bg-success'
+    },
+    {
+      id: 15,
+      name: 'Sales Report Q1',
+      size: '28MB',
+      date: '2024-04-28',
+      color: 'bg-primary'
+    },
+    {
+      id: 16,
+      name: 'Employee Handbook',
+      size: '65MB',
+      date: '2024-04-25',
+      color: 'bg-warning'
     }
   ];
 
   return (
     <div className="vh-100 d-flex flex-column" style={{ backgroundColor: '#1a4d3a' }}>
       {/* Desktop Layout */}
-      <div className="d-none d-md-flex flex-fill">
+      <div className="d-none d-md-flex flex-fill overflow-hidden">
         {/* Sidebar - Desktop */}
-        <div className="bg-dark text-white p-3 d-flex flex-column" style={{ width: '250px', backgroundColor: '#0f2d1f !important' }}>
+        <div className="bg-dark text-white p-3 d-flex flex-column" style={{ width: '250px', backgroundColor: '#0f2d1f !important', minHeight: '0' }}>
           {/* Logo */}
           <div className="d-flex align-items-center mb-4">
             <div className="me-2" style={{ fontSize: '1.2rem' }}>📁</div>
@@ -108,14 +137,14 @@ const FileHubUI = () => {
 
           {/* Navigation */}
           <nav className="nav flex-column">
-            <a href="#" className="nav-link text-white d-flex align-items-center py-3 px-3 rounded mb-2" style={{ backgroundColor: '#2d5a3d' }}>
+            <a href="#" className="nav-link text-white d-flex align-items-center py-3 px-3 rounded mb-2  bg-success" style={{ backgroundColor: '#2d5a3d' }}>
               <Home size={18} className="me-3" />
               Home
             </a>
-            <a href="#" className="nav-link text-white d-flex align-items-center py-3 px-3 rounded mb-2 bg-success">
+            {/* <a href="#" className="nav-link text-white d-flex align-items-center py-3 px-3 rounded mb-2 bg-success">
               <div className="me-3" style={{ width: '18px', height: '18px' }}>📄</div>
               My Files
-            </a>
+            </a> */}
             <a href="#" className="nav-link text-white d-flex align-items-center py-3 px-3 rounded mb-2">
               <Share2 size={18} className="me-3" />
               Shared
@@ -128,9 +157,9 @@ const FileHubUI = () => {
         </div>
 
         {/* Main Content - Desktop */}
-        <div className="flex-fill d-flex flex-column">
+        <div className="flex-fill d-flex flex-column overflow-hidden" style={{ minHeight: '0' }}>
           {/* Header */}
-          <header className="d-flex justify-content-between align-items-center p-3 border-bottom" style={{ backgroundColor: '#1a4d3a', borderColor: '#2d5a3d !important' }}>
+          <header className="d-flex justify-content-between align-items-center p-3 border-bottom flex-shrink-0" style={{ backgroundColor: '#1a4d3a', borderColor: '#2d5a3d !important' }}>
             <div className="flex-fill mx-3" style={{ maxWidth: '400px' }}>
               <div className="input-group">
                 <span className="input-group-text bg-dark border-0" style={{ color: '#8a9a8a' }}>
@@ -156,7 +185,7 @@ const FileHubUI = () => {
           </header>
 
           {/* Content Area with Scroll */}
-          <main className="flex-fill p-4 overflow-auto" style={{ backgroundColor: '#1a4d3a' }}>
+          <main className="flex-fill p-4 overflow-auto" style={{ backgroundColor: '#1a4d3a', minHeight: '0' }}>
             {/* Page Header */}
             <div className="d-flex justify-content-between align-items-center mb-4">
               <h2 className="text-white mb-0">My Files</h2>
@@ -188,7 +217,8 @@ const FileHubUI = () => {
               <div className="row g-3">
                 {files.map((file) => (
                   <div key={file.id} className="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12">
-                    <div 
+                    < 
+                      div 
                       className="card h-100 border-0 shadow-sm"
                       style={{ backgroundColor: '#2d5a3d', cursor: 'pointer' }}
                     >
@@ -282,7 +312,7 @@ const FileHubUI = () => {
       {/* Mobile Layout */}
       <div className="d-md-none d-flex flex-column h-100">
         {/* Header - Mobile */}
-        <header className="d-flex justify-content-between align-items-center p-3 border-bottom" style={{ backgroundColor: '#1a4d3a', borderColor: '#2d5a3d !important' }}>
+        <header className="d-flex justify-content-between align-items-center p-3 border-bottom flex-shrink-0" style={{ backgroundColor: '#1a4d3a', borderColor: '#2d5a3d !important' }}>
           <h5 className="text-white mb-0 fw-bold">FileX</h5>
           <div className="d-flex align-items-center">
             <button className="btn btn-link text-white me-2 p-2">
@@ -296,7 +326,7 @@ const FileHubUI = () => {
         </header>
 
         {/* Search Bar - Mobile */}
-        <div className="p-3" style={{ backgroundColor: '#1a4d3a' }}>
+        <div className="p-3 flex-shrink-0" style={{ backgroundColor: '#1a4d3a' }}>
           <div className="input-group">
             <span className="input-group-text bg-dark border-0" style={{ color: '#8a9a8a' }}>
               <Search size={18} />
@@ -311,7 +341,7 @@ const FileHubUI = () => {
         </div>
 
         {/* Content Area - Mobile */}
-        <main className="flex-fill p-3 overflow-auto" style={{ backgroundColor: '#1a4d3a' }}>
+        <main className="flex-fill p-3 overflow-auto" style={{ backgroundColor: '#1a4d3a', minHeight: '0' }}>
           {/* Page Header */}
           <div className="d-flex justify-content-between align-items-center mb-3">
             <h4 className="text-white mb-0">My Files</h4>
@@ -432,7 +462,7 @@ const FileHubUI = () => {
         </main>
 
         {/* Bottom Navigation - Mobile */}
-        <nav className="bg-dark border-top d-flex" style={{ backgroundColor: '#0f2d1f !important', borderColor: '#2d5a3d !important' }}>
+        <nav className="bg-dark border-top d-flex flex-shrink-0" style={{ backgroundColor: '#0f2d1f !important', borderColor: '#2d5a3d !important' }}>
           <a href="#" className="flex-fill text-center text-white py-3 text-decoration-none" style={{ backgroundColor: '#2d5a3d' }}>
             <Home size={20} className="d-block mx-auto mb-1" />
             <small>Home</small>
