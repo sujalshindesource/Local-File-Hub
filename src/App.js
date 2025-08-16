@@ -39,27 +39,27 @@ const FileHubUI = () => {
       date: '2024-07-10',
       color: 'bg-light'
     },
-    {
-      id: 5,
-      name: 'Team Meeting Notes',
-      size: '5MB',
-      date: '2024-07-05',
-      color: 'bg-warning'
-    },
-    {
-      id: 6,
-      name: 'Design Assets Library',
-      size: '100MB',
-      date: '2024-06-28',
-      color: 'bg-secondary'
-    },
-    {
-      id: 7,
-      name: 'Archived Documents',
-      size: '200MB',
-      date: '2024-06-15',
-      color: 'bg-warning'
-    },
+    // {
+    //   id: 5,
+    //   name: 'Team Meeting Notes',
+    //   size: '5MB',
+    //   date: '2024-07-05',
+    //   color: 'bg-warning'
+    // },
+    // {
+    //   id: 6,
+    //   name: 'Design Assets Library',
+    //   size: '100MB',
+    //   date: '2024-06-28',
+    //   color: 'bg-secondary'
+    // },
+    // {
+    //   id: 7,
+    //   name: 'Archived Documents',
+    //   size: '200MB',
+    //   date: '2024-06-15',
+    //   color: 'bg-warning'
+    // },
     {
       id: 8,
       name: 'Miscellaneous Files',
@@ -154,7 +154,7 @@ const FileHubUI = () => {
   // Reusable components
   const FileCard = ({ file, isMobile = false }) => {
     const cardSize = isMobile ? { width: '40px', height: '50px', iconW: '24px', iconH: '28px' } 
-                              : { width: '60px', height: '75px', iconW: '60px', iconH: '75px' };
+                              : { width: '50px', height: '75px', iconW: '50px', iconH: '75px' };
     
     return (
       <div 
@@ -270,6 +270,12 @@ const FileHubUI = () => {
     </nav>
   );
 
+  const handleListRclick = ()=>{
+    alert('here is right click')
+  }
+
+
+
   return (
     <div className="vh-100 d-flex flex-column" style={{ backgroundColor: '#1a4d3a' }}>
       {/* Header - Always visible */}
@@ -341,7 +347,7 @@ const FileHubUI = () => {
               <h2 className="text-white mb-0 d-none d-md-block">My Files</h2>
               <h4 className="text-white mb-0 d-md-none">My Files</h4>
               {selectedFolderPath && (
-                <small className="text-muted d-block mt-1">
+                <small className="text-muted d-block mt-1 color-white">
                   <FolderOpen size={14} className="me-1" />
                   {selectedFolderPath}
                 </small>
@@ -414,9 +420,9 @@ const FileHubUI = () => {
               </div>
             ) : (
               /* List View - Responsive */
-              <div className="list-group">
+              <div className="list-group" >
                 {filesToDisplay.map((file) => (
-                  <FileListItem key={file.id} file={file} isMobile={window.innerWidth < 768} />
+                  <FileListItem key={file.id} file={file} isMobile={window.innerWidth < 768} onContextMenu={() => handleListRclick(file)} />
                 ))}
               </div>
             )}
