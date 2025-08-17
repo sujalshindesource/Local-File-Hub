@@ -1,6 +1,6 @@
 
 
-import React, { useState } from 'react';
+import React, { useState , useEffect} from 'react';
 import { Search, Bell, Upload, Home, Share2, Trash2, List, Grid, FolderOpen } from 'lucide-react';
 
 const FileHubUI = () => {
@@ -8,6 +8,58 @@ const FileHubUI = () => {
   const [myFiles, setMyFiles] = useState([]);
   const [myFileFetch, setMyFileFetch] = useState(false);
   const [selectedFolderPath, setSelectedFolderPath] = useState('');
+  const [contextMenu, setContextMenu] = useState(null); // {x, y, file} or null
+
+
+
+
+const sendFileOperation = async (operation,filename,path ="C:/Users/Siddhesh/Desktop/Netflix/") => {
+  try {
+    const response = await fetch("http://localhost:5000/file", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ operation, path, filename }),
+    });
+
+    const result = await response.json();
+    console.log("Backend Response:", result);
+    return result;
+  } catch (error) {
+    console.error("Error sending operation:", error);
+  }
+};
+
+
+
+const handleRightClick = (e, file) => {
+  e.preventDefault(); // stop browser’s menu
+  setContextMenu({
+    x: e.pageX,
+    y: e.pageY,
+    file: file
+  });
+};
+
+const handleMenuClick = (operation , filename) => {
+  sendFileOperation(operation, filename);
+  setContextMenu(null); // close menu
+};
+
+
+useEffect(() => {
+  const handleClickOutside = () => setContextMenu(null);
+  window.addEventListener("click", handleClickOutside);
+  return () => window.removeEventListener("click", handleClickOutside);
+}, []);
+
+
+
+
+
+
+
+
+
 
   // Default files when no folder is selected
   const defaultFiles = [
@@ -84,7 +136,7 @@ const FileHubUI = () => {
           const dirHandle = await window.showDirectoryPicker();
           const files = await scanDirectory(dirHandle);
           setMyFiles(files);
-          setSelectedFolderPath(dirHandle.name);
+          setSelectedFolderPath("C:/Users/Siddhesh/Desktop/Netflix/");
           setMyFileFetch(true);
         } else {
           // Fallback: Use file input for folder selection
@@ -210,6 +262,11 @@ const FileHubUI = () => {
       <div 
         className="list-group-item d-flex align-items-center mb-2 border-0"
         style={{ backgroundColor: '#2d5a3d', cursor: 'pointer', padding: isMobile ? '8px' : '12px' }}
+        onDoubleClick={() => {
+          sendFileOperation("open",file.name,selectedFolderPath)
+          console.log(selectedFolderPath)
+        }} // path no 
+        onContextMenu={(e) => handleRightClick(e, file)}
       >
         {/* File Icon */}
         <div 
@@ -270,7 +327,9 @@ const FileHubUI = () => {
     </nav>
   );
 
-  const handleListRclick = ()=>{
+  const handlefileaction = (e , file)=>{
+    console.log(file.path)
+    console.log(e)
     alert('here is right click')
   }
 
@@ -422,7 +481,7 @@ const FileHubUI = () => {
               /* List View - Responsive */
               <div className="list-group" >
                 {filesToDisplay.map((file) => (
-                  <FileListItem key={file.id} file={file} isMobile={window.innerWidth < 768} onContextMenu={() => handleListRclick(file)} />
+                  <FileListItem key={file.id} file={file} isMobile={window.innerWidth < 768}/>
                 ))}
               </div>
             )}
@@ -435,7 +494,61 @@ const FileHubUI = () => {
            style={{ backgroundColor: '#0f2d1f !important', borderColor: '#2d5a3d !important' }}>
         <Sidebar isMobile={true} />
       </div>
+ 
+{/* //menu */}
+      {contextMenu && (
+  <div
+    style={{
+      position: "absolute",
+      top: contextMenu.y,
+      left: contextMenu.x,
+      background: "#2d5a3d",
+      color: "white",
+      border: "1px solid #444",
+      borderRadius: "6px",
+      padding: "6px",
+      zIndex: 9999
+    }}
+  >
+    <div
+      className="menu-item"
+      style={{ padding: "5px 10px", cursor: "pointer" }}
+      onClick={() => handleMenuClick("open",contextMenu.file.name)}
+    >
+      Open
     </div>
+    <div
+      className="menu-item"
+      style={{ padding: "5px 10px", cursor: "pointer" }}
+      onClick={() => handleMenuClick("delete", contextMenu.file.name)}
+    >
+      Delete
+    </div>
+    <div
+      className="menu-item"
+      style={{ padding: "5px 10px", cursor: "pointer" }}
+      onClick={() => handleMenuClick("rename",contextMenu.file.name)}
+    >
+      Rename
+    </div>
+    <div
+      className="menu-item"
+      style={{ padding: "5px 10px", cursor: "pointer" }}
+      onClick={() => handleMenuClick("move",contextMenu.file.name)}
+    >
+      Move
+    </div>
+    <div
+      className="menu-item"
+      style={{ padding: "5px 10px", cursor: "pointer" }}
+      onClick={() => handleMenuClick("copy",contextMenu.file.name)}
+    >
+      Copy
+    </div>
+  </div>
+)}
+    </div>
+    
   );
 };
 
