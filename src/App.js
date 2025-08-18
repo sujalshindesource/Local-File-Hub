@@ -7,7 +7,7 @@ const FileHubUI = () => {
   const [viewMode, setViewMode] = useState('grid');
   const [myFiles, setMyFiles] = useState([]);
   const [myFileFetch, setMyFileFetch] = useState(false);
-  const [selectedFolderPath, setSelectedFolderPath] = useState('');
+  const [selectedFolderPath, setSelectedFolderPath] = useState('C:/Users/Siddhesh/Desktop/Netflix/');
   const [contextMenu, setContextMenu] = useState(null); // {x, y, file} or null
 
 
@@ -261,10 +261,11 @@ useEffect(() => {
     return (
       <div 
         className="list-group-item d-flex align-items-center mb-2 border-0"
+        
         style={{ backgroundColor: '#2d5a3d', cursor: 'pointer', padding: isMobile ? '8px' : '12px' }}
         onDoubleClick={() => {
-          sendFileOperation("open",file.name,selectedFolderPath)
-          console.log(selectedFolderPath)
+          sendFileOperation("open",file.name,'C:/Users/Siddhesh/Desktop/Netflix/')
+          console.log(file.name,selectedFolderPath)
         }} // path no 
         onContextMenu={(e) => handleRightClick(e, file)}
       >
@@ -495,57 +496,248 @@ useEffect(() => {
         <Sidebar isMobile={true} />
       </div>
  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
 {/* //menu */}
-      {contextMenu && (
-  <div
-    style={{
-      position: "absolute",
-      top: contextMenu.y,
-      left: contextMenu.x,
-      background: "#2d5a3d",
-      color: "white",
-      border: "1px solid #444",
-      borderRadius: "6px",
-      padding: "6px",
-      zIndex: 9999
-    }}
-  >
+{/* //menu */}
+{contextMenu && (
+  <>
+    <style>{`
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: scale(0.95) translateY(-5px);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1) translateY(0);
+        }
+      }
+      
+      .premium-menu-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        transition: left 0.5s;
+      }
+      
+      .premium-menu-item:hover::before {
+        left: 100%;
+      }
+    `}</style>
+    
     <div
-      className="menu-item"
-      style={{ padding: "5px 10px", cursor: "pointer" }}
-      onClick={() => handleMenuClick("open",contextMenu.file.name)}
+      style={{
+        position: "absolute",
+        top: contextMenu.y,
+        left: contextMenu.x,
+        background: "linear-gradient(135deg, #2d5a3d 0%, #1e4a2e 100%)",
+        color: "white",
+        border: "1px solid rgba(255, 255, 255, 0.1)",
+        borderRadius: "12px",
+        padding: "8px",
+        minWidth: "180px",
+        boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.05)",
+        backdropFilter: "blur(10px)",
+        animation: "slideIn 0.15s cubic-bezier(0.4, 0, 0.2, 1)",
+        transformOrigin: "top left",
+        zIndex: 9999
+      }}
     >
-      Open
+      <div
+        className="menu-item d-flex align-items-center premium-menu-item"
+        style={{ 
+          padding: "10px 12px", 
+          margin: "2px 0",
+          borderRadius: "8px",
+          cursor: "pointer",
+          color: "#e8f5e8",
+          fontSize: "14px",
+          fontWeight: "500",
+          transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+          position: "relative",
+          overflow: "hidden"
+        }}
+        onMouseEnter={(e) => {
+          e.target.style.background = "linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%)";
+          e.target.style.color = "#ffffff";
+          e.target.style.transform = "translateX(4px)";
+          e.target.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.2)";
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.background = "transparent";
+          e.target.style.color = "#e8f5e8";
+          e.target.style.transform = "translateX(0)";
+          e.target.style.boxShadow = "none";
+        }}
+        onClick={() => handleMenuClick("open",contextMenu.file.name)}
+      >
+        <svg className="me-2" width="16" height="16" fill="currentColor" viewBox="0 0 24 24" style={{ opacity: "0.8", marginRight: "10px" }}>
+          <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+        </svg>
+        Open
+      </div>
+      
+      <div style={{ height: "1px", background: "linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent)", margin: "6px 0" }}></div>
+      
+      <div
+        className="menu-item d-flex align-items-center premium-menu-item"
+        style={{ 
+          padding: "10px 12px", 
+          margin: "2px 0",
+          borderRadius: "8px",
+          cursor: "pointer",
+          color: "#e8f5e8",
+          fontSize: "14px",
+          fontWeight: "500",
+          transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+          position: "relative",
+          overflow: "hidden"
+        }}
+        onMouseEnter={(e) => {
+          e.target.style.background = "linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%)";
+          e.target.style.color = "#ffffff";
+          e.target.style.transform = "translateX(4px)";
+          e.target.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.2)";
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.background = "transparent";
+          e.target.style.color = "#e8f5e8";
+          e.target.style.transform = "translateX(0)";
+          e.target.style.boxShadow = "none";
+        }}
+        onClick={() => handleMenuClick("delete", contextMenu.file.name)}
+      >
+        <svg className="me-2" width="16" height="16" fill="currentColor" viewBox="0 0 24 24" style={{ opacity: "0.8", marginRight: "10px" }}>
+          <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+        </svg>
+        Delete
+      </div>
+      
+      <div
+        className="menu-item d-flex align-items-center premium-menu-item"
+        style={{ 
+          padding: "10px 12px", 
+          margin: "2px 0",
+          borderRadius: "8px",
+          cursor: "pointer",
+          color: "#e8f5e8",
+          fontSize: "14px",
+          fontWeight: "500",
+          transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+          position: "relative",
+          overflow: "hidden"
+        }}
+        onMouseEnter={(e) => {
+          e.target.style.background = "linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%)";
+          e.target.style.color = "#ffffff";
+          e.target.style.transform = "translateX(4px)";
+          e.target.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.2)";
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.background = "transparent";
+          e.target.style.color = "#e8f5e8";
+          e.target.style.transform = "translateX(0)";
+          e.target.style.boxShadow = "none";
+        }}
+        onClick={() => handleMenuClick("rename",contextMenu.file.name)}
+      >
+        <svg className="me-2" width="16" height="16" fill="currentColor" viewBox="0 0 24 24" style={{ opacity: "0.8", marginRight: "10px" }}>
+          <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+        </svg>
+        Rename
+      </div>
+      
+      <div
+        className="menu-item d-flex align-items-center premium-menu-item"
+        style={{ 
+          padding: "10px 12px", 
+          margin: "2px 0",
+          borderRadius: "8px",
+          cursor: "pointer",
+          color: "#e8f5e8",
+          fontSize: "14px",
+          fontWeight: "500",
+          transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+          position: "relative",
+          overflow: "hidden"
+        }}
+        onMouseEnter={(e) => {
+          e.target.style.background = "linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%)";
+          e.target.style.color = "#ffffff";
+          e.target.style.transform = "translateX(4px)";
+          e.target.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.2)";
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.background = "transparent";
+          e.target.style.color = "#e8f5e8";
+          e.target.style.transform = "translateX(0)";
+          e.target.style.boxShadow = "none";
+        }}
+        onClick={() => handleMenuClick("move",contextMenu.file.name)}
+      >
+        <svg className="me-2" width="16" height="16" fill="currentColor" viewBox="0 0 24 24" style={{ opacity: "0.8", marginRight: "10px" }}>
+          <path d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6l5 5 5-5h-3v-3h-4v3zm-3 2v3h3v3l5-5-5-5v3H6z"/>
+        </svg>
+        Move
+      </div>
+      
+      <div
+        className="menu-item d-flex align-items-center premium-menu-item"
+        style={{ 
+          padding: "10px 12px", 
+          margin: "2px 0",
+          borderRadius: "8px",
+          cursor: "pointer",
+          color: "#e8f5e8",
+          fontSize: "14px",
+          fontWeight: "500",
+          transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+          position: "relative",
+          overflow: "hidden"
+        }}
+        onMouseEnter={(e) => {
+          e.target.style.background = "linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%)";
+          e.target.style.color = "#ffffff";
+          e.target.style.transform = "translateX(4px)";
+          e.target.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.2)";
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.background = "transparent";
+          e.target.style.color = "#e8f5e8";
+          e.target.style.transform = "translateX(0)";
+          e.target.style.boxShadow = "none";
+        }}
+        onClick={() => handleMenuClick("copy",contextMenu.file.name)}
+      >
+        <svg className="me-2" width="16" height="16" fill="currentColor" viewBox="0 0 24 24" style={{ opacity: "0.8", marginRight: "10px" }}>
+          <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+        </svg>
+        Copy
+      </div>
     </div>
-    <div
-      className="menu-item"
-      style={{ padding: "5px 10px", cursor: "pointer" }}
-      onClick={() => handleMenuClick("delete", contextMenu.file.name)}
-    >
-      Delete
-    </div>
-    <div
-      className="menu-item"
-      style={{ padding: "5px 10px", cursor: "pointer" }}
-      onClick={() => handleMenuClick("rename",contextMenu.file.name)}
-    >
-      Rename
-    </div>
-    <div
-      className="menu-item"
-      style={{ padding: "5px 10px", cursor: "pointer" }}
-      onClick={() => handleMenuClick("move",contextMenu.file.name)}
-    >
-      Move
-    </div>
-    <div
-      className="menu-item"
-      style={{ padding: "5px 10px", cursor: "pointer" }}
-      onClick={() => handleMenuClick("copy",contextMenu.file.name)}
-    >
-      Copy
-    </div>
-  </div>
+  </>
 )}
     </div>
     
