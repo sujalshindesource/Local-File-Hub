@@ -254,56 +254,208 @@ useEffect(() => {
     );
   };
 
-  const FileListItem = ({ file, isMobile = false }) => {
+
+const FileListItem = ({ file, isMobile = false }) => {
     const iconSize = isMobile ? '40px' : '50px';
     const iconInnerSize = isMobile ? { w: '24px', h: '28px' } : { w: '30px', h: '35px' };
     
     return (
       <div 
-        className="list-group-item d-flex align-items-center mb-2 border-0"
-        
-        style={{ backgroundColor: '#2d5a3d', cursor: 'pointer', padding: isMobile ? '8px' : '12px' }}
+        className="list-group-item d-flex align-items-center mb-2 border-0 position-relative"
+        style={{ 
+          backgroundColor: '#2d5a3d', 
+          cursor: 'pointer', 
+          padding: isMobile ? '12px' : '16px',
+          borderRadius: '12px',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+          transition: 'all 0.3s ease',
+          overflow: 'hidden'
+        }}
         onDoubleClick={() => {
           sendFileOperation("open",file.name,'C:/Users/Siddhesh/Desktop/Netflix/')
           console.log(file.name,selectedFolderPath)
-        }} // path no 
+        }}
         onContextMenu={(e) => handleRightClick(e, file)}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = '#345a42';
+          e.currentTarget.style.transform = 'translateY(-2px)';
+          e.currentTarget.style.boxShadow = '0 8px 20px rgba(0, 0, 0, 0.25)';
+          e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = '#2d5a3d';
+          e.currentTarget.style.transform = 'translateY(0px)';
+          e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+          e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+        }}
       >
+        {/* Top shine line */}
+        <div 
+          className="position-absolute"
+          style={{
+            top: 0,
+            left: '12px',
+            right: '12px',
+            height: '1px',
+            background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent)'
+          }}
+        />
+        
         {/* File Icon */}
         <div 
-          className={`${file.color} rounded d-flex align-items-center justify-content-center me-3`}
-          style={{ width: iconSize, height: iconSize, minWidth: iconSize, opacity: '0.9' }}
+          className={`${file.color} rounded d-flex align-items-center justify-content-center me-3 position-relative`}
+          style={{ 
+            width: iconSize, 
+            height: iconSize, 
+            minWidth: iconSize, 
+            opacity: '0.9',
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+            transition: 'transform 0.3s ease'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'scale(1.05)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'scale(1)';
+          }}
         >
+          {/* Icon shine */}
           <div 
-            className="bg-white rounded shadow"
+            className="position-absolute rounded"
+            style={{
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, transparent 50%)',
+              opacity: 0.7
+            }}
+          />
+          
+          <div 
+            className="bg-white rounded shadow position-relative"
             style={{ 
               width: iconInnerSize.w, 
               height: iconInnerSize.h,
               display: 'flex',
               flexDirection: 'column',
-              padding: isMobile ? '3px' : '4px'
+              padding: isMobile ? '4px' : '5px',
+              zIndex: 10
             }}
           >
-            <div style={{ height: '2px', backgroundColor: '#ccc', marginBottom: '2px' }}></div>
-            <div style={{ height: '2px', backgroundColor: '#ccc', marginBottom: '2px' }}></div>
-            <div style={{ height: '2px', backgroundColor: '#ccc', marginBottom: '2px' }}></div>
-            <div style={{ height: '2px', backgroundColor: '#ccc', width: '60%' }}></div>
+            <div style={{ height: '2px', backgroundColor: '#e5e7eb', marginBottom: '2px', borderRadius: '1px' }}></div>
+            <div style={{ height: '2px', backgroundColor: '#e5e7eb', marginBottom: '2px', borderRadius: '1px' }}></div>
+            <div style={{ height: '2px', backgroundColor: '#e5e7eb', marginBottom: '2px', borderRadius: '1px' }}></div>
+            <div style={{ height: '2px', backgroundColor: '#94a3b8', width: '60%', borderRadius: '1px' }}></div>
           </div>
         </div>
         
         {/* File Details */}
-        <div className="flex-fill">
-          <h6 className="mb-1 text-white fw-semibold" style={{ fontSize: isMobile ? '0.85rem' : '1rem' }}>
+        <div className="flex-fill" style={{ minWidth: 0 }}>
+          <h6 
+            className="mb-1 fw-semibold" 
+            style={{ 
+              fontSize: isMobile ? '0.9rem' : '1rem',
+              color: '#f8fafc',
+              fontWeight: '600',
+              lineHeight: '1.3',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              textShadow: '0 1px 2px rgba(0, 0, 0, 0.1)'
+            }}
+          >
             {file.name}
           </h6>
-          <div className="d-flex">
-            <small className="text-muted me-3" style={{ fontSize: isMobile ? '0.75rem' : '0.8rem' }}>{file.size}</small>
-            <small className="text-muted" style={{ fontSize: isMobile ? '0.75rem' : '0.8rem' }}>{file.date}</small>
+          <div className="d-flex align-items-center">
+            <small 
+              className="me-4" 
+              style={{ 
+                fontSize: isMobile ? '0.75rem' : '0.8rem',
+                color: 'rgba(248, 250, 252, 0.8)',
+                fontWeight: '500'
+              }}
+            >
+              {file.size}
+            </small>
+            <small 
+              style={{ 
+                fontSize: isMobile ? '0.75rem' : '0.8rem',
+                color: 'rgba(248, 250, 252, 0.6)',
+                fontWeight: '400'
+              }}
+            >
+              {file.date}
+            </small>
           </div>
         </div>
+
+        {/* Right indicator */}
+        <div 
+          className="ms-2"
+          style={{
+            width: '3px',
+            height: '20px',
+            backgroundColor: '#22c55e',
+            borderRadius: '2px',
+            opacity: 0,
+            transition: 'opacity 0.3s ease'
+          }}
+          ref={(el) => {
+            if (el) {
+              const parent = el.closest('.list-group-item');
+              parent.addEventListener('mouseenter', () => {
+                el.style.opacity = '1';
+              });
+              parent.addEventListener('mouseleave', () => {
+                el.style.opacity = '0';
+              });
+            }
+          }}
+        />
       </div>
     );
   };
+
+
+// Demo component
+const FileListPreview = () => {
+  const sampleFiles = [
+    { name: '1.js', size: '2.3 KB', date: '2023-07-09', color: 'bg-blue-500' },
+    { name: '2.png', size: '1.2 MB', date: '2023-07-09', color: 'bg-orange-500' },
+    { name: '3.png', size: '856 KB', date: '2023-07-09', color: 'bg-yellow-500' },
+    { name: '4.png', size: '3.1 MB', date: '2023-07-09', color: 'bg-green-500' },
+    { name: 'box1.jpg', size: '4.7 MB', date: '2023-07-09', color: 'bg-red-500' },
+    { name: 'box2.jpg', size: '2.8 MB', date: '2023-07-09', color: 'bg-purple-500' },
+  ];
+
+  return (
+    <div 
+      className="min-h-screen p-6"
+      style={{
+        background: 'linear-gradient(135deg, #1e3a2f 0%, #2d5a3d 50%, #1a2f26 100%)',
+      }}
+    >
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-3xl font-bold text-white mb-8 text-center">
+          Premium File List Component
+        </h1>
+        
+        <div className="bg-black bg-opacity-20 rounded-2xl p-6 backdrop-blur-sm border border-white border-opacity-10">
+          {sampleFiles.map((file, index) => (
+            <FileListItem key={index} file={file} />
+          ))}
+        </div>
+        
+        <div className="text-center mt-8 text-white text-opacity-70">
+          <p>Hover over items to see the premium effects!</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 
   const Sidebar = ({ isMobile = false }) => (
     <nav className={`nav ${isMobile ? 'd-flex' : 'flex-column'}`}>
@@ -515,7 +667,6 @@ useEffect(() => {
 
 
  
-{/* //menu */}
 {/* //menu */}
 {contextMenu && (
   <>
