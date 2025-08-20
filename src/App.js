@@ -10,6 +10,7 @@ const FileHubUI = () => {
   const [selectedFolderPath, setSelectedFolderPath] = useState('C:/Users/Siddhesh/Desktop/Netflix/');
   const [contextMenu, setContextMenu] = useState(null); // {x, y, file} or null
 
+  const [mainsec , setMainsec] = useState("home")
 
 
 
@@ -456,24 +457,29 @@ const FileListPreview = () => {
   );
 };
 
-
   const Sidebar = ({ isMobile = false }) => (
     <nav className={`nav ${isMobile ? 'd-flex' : 'flex-column'}`}>
       <a href="#" className={`nav-link text-white d-flex align-items-center rounded mb-2 bg-success ${
         isMobile ? 'flex-fill text-center py-3 text-decoration-none' : 'py-3 px-3'
-      }`} style={{ backgroundColor: isMobile ? '#2d5a3d' : '#2d5a3d' }}>
+      }`} style={{ backgroundColor: isMobile ? '#2d5a3d' : '#2d5a3d' }}
+      onClick={() => setMainsec("home")}
+      >
         <Home size={isMobile ? 20 : 18} className={isMobile ? 'd-block mx-auto mb-1' : 'me-3'} />
         {isMobile ? <small>Home</small> : 'Home'}
       </a>
       <a href="#" className={`nav-link text-white d-flex align-items-center rounded mb-2 ${
         isMobile ? 'flex-fill text-center py-3 text-decoration-none' : 'py-3 px-3'
-      }`}>
+      }`}
+      onClick={() => setMainsec("shared")}
+      >
         <Share2 size={isMobile ? 20 : 18} className={isMobile ? 'd-block mx-auto mb-1' : 'me-3'} />
         {isMobile ? <small>Shared</small> : 'Shared'}
       </a>
       <a href="#" className={`nav-link text-white d-flex align-items-center rounded mb-2 ${
         isMobile ? 'flex-fill text-center py-3 text-decoration-none' : 'py-3 px-3'
-      }`}>
+      }`}
+      onClick={() => setMainsec("trash")}
+      >
         <Trash2 size={isMobile ? 20 : 18} className={isMobile ? 'd-block mx-auto mb-1' : 'me-3'} />
         {isMobile ? <small>Trash</small> : 'Trash'}
       </a>
@@ -574,7 +580,10 @@ const FileListPreview = () => {
                 <Upload size={18} className="me-2" />
                 Upload
               </button>
-              <button 
+
+              {/* fetch sys on home only  */}
+              {mainsec === "home" ? 
+              (<><button 
                 className={`btn btn-outline-info ${myFileFetch ? 'btn-info text-white' : ''} btn-sm d-md-none`}
                 onClick={handleFetchDrop}
               >
@@ -588,10 +597,20 @@ const FileListPreview = () => {
                 <FolderOpen size={18} className="me-2" />
                 {myFileFetch ? 'Drop' : 'Fetch'}
               </button>
+              </>)
+              :
+              (
+                ''
+              )
+            }
             </div>
           </div>
 
-          {/* View Controls */}
+          {/* display grid on home  */}
+          {mainsec === "home" ?
+          (
+            <>
+            {/* View Controls */}
           <div className="d-flex mb-4 flex-shrink-0">
             <button
               className={`btn me-2 btn-sm d-md-none ${viewMode === 'list' ? 'btn-success' : 'btn-outline-light'}`}
@@ -618,7 +637,17 @@ const FileListPreview = () => {
               <Grid size={18} />
             </button>
           </div>
+            </>
+          )  
+          :
+          (
+            ""
+          )       
+        }
 
+        {mainsec === "home" ?
+        (
+          <>
           {/* Files Display */}
           <div className="flex-fill overflow-auto">
             {viewMode === 'grid' ? (
@@ -639,6 +668,13 @@ const FileListPreview = () => {
               </div>
             )}
           </div>
+          </>
+        )
+        :
+        (
+          ''
+        )        
+      }
         </main>
       </div>
 
@@ -647,26 +683,7 @@ const FileListPreview = () => {
            style={{ backgroundColor: '#0f2d1f !important', borderColor: '#2d5a3d !important' }}>
         <Sidebar isMobile={true} />
       </div>
- 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
 {/* //menu */}
 {contextMenu && (
   <>
