@@ -2,6 +2,7 @@
 
 import React, { useState , useEffect} from 'react';
 import { Search, Bell, Upload, Home, Share2, Trash2, List, Grid, FolderOpen } from 'lucide-react';
+import { Monitor, Smartphone, Tablet, Laptop, Tv, Watch, Plus,  HardDrive, Wifi, WifiOff, MoreVertical, Settings, RefreshCw } from 'lucide-react'; // change ofor sahred
 
 const FileHubUI = () => {
   const [viewMode, setViewMode] = useState('grid');
@@ -494,6 +495,449 @@ const FileListPreview = () => {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+///new changes about shared tab
+const SharedDevices = () => {
+  const [fabExpanded, setFabExpanded] = useState(false);
+  const [devices, setDevices] = useState([
+    { id: 1, name: 'Desktop Pro', type: 'desktop', status: 'online', ip: '192.168.1.101', lastSeen: '2 mins ago', storage: '45%' },
+    { id: 2, name: 'iPhone 13', type: 'mobile', status: 'online', ip: '192.168.1.102', lastSeen: 'Active now', storage: '67%' },
+    { id: 3, name: 'iPad Air', type: 'tablet', status: 'offline', ip: '192.168.1.103', lastSeen: '1 hour ago', storage: '23%' },
+    { id: 4, name: 'MacBook Pro', type: 'laptop', status: 'online', ip: '192.168.1.104', lastSeen: '5 mins ago', storage: '89%' },
+    { id: 5, name: 'Smart TV', type: 'tv', status: 'idle', ip: '192.168.1.105', lastSeen: '30 mins ago', storage: '12%' },
+    { id: 6, name: 'Apple Watch', type: 'watch', status: 'online', ip: '192.168.1.106', lastSeen: 'Active now', storage: '56%' },
+  ]);
+
+  const getDeviceIcon = (type) => {
+    switch(type) {
+      case 'desktop': return <Monitor className="w-8 h-8" />;
+      case 'mobile': return <Smartphone className="w-8 h-8" />;
+      case 'tablet': return <Tablet className="w-8 h-8" />;
+      case 'laptop': return <Laptop className="w-8 h-8" />;
+      case 'tv': return <Tv className="w-8 h-8" />;
+      case 'watch': return <Watch className="w-8 h-8" />;
+      default: return <HardDrive className="w-8 h-8" />;
+    }
+  };
+
+  const getStatusColor = (status) => {
+    switch(status) {
+      case 'online': return '#10b981';
+      case 'offline': return '#ef4444';
+      case 'idle': return '#f59e0b';
+      default: return '#6b7280';
+    }
+  };
+
+  return (
+    <div style={{
+      minHeight: 'fit-content',
+      backgroundColor: '#1a3a32',
+      padding: '2rem',
+      position: 'relative',
+      borderRadius : '6px'
+    }}>
+      {/* Header */}
+      <div style={{
+        marginBottom: '2rem',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
+        <h1 style={{
+          color: '#e2e8f0',
+          fontSize: '2rem',
+          fontWeight: '600',
+          margin: 0
+        }}>Shared Devices</h1>
+        <div style={{
+          display: 'flex',
+          gap: '0.5rem',
+          alignItems: 'center',
+          color: '#94a3b8'
+        }}>
+          <RefreshCw className="w-5 h-5 cursor-pointer hover:text-white transition-colors" />
+          <span style={{ fontSize: '0.875rem' }}>Last sync: 2 mins ago</span>
+        </div>
+      </div>
+
+      {/* Device Grid */}
+      <div className="row g-4">
+        {devices.map((device) => (
+          <div key={device.id} className="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-3">
+            <div 
+              className="device-card"
+              style={{
+                backgroundColor: '#234940',
+                borderRadius: '12px',
+                padding: '1.5rem',
+                position: 'relative',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                transition: 'all 0.3s ease',
+                cursor: 'pointer',
+                height: '100%',
+                minHeight: '220px',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-4px)';
+                e.currentTarget.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.3)';
+                e.currentTarget.style.borderColor = 'rgba(16, 185, 129, 0.5)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = 'none';
+                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+              }}
+            >
+              {/* Status Indicator */}
+              <div style={{
+                position: 'absolute',
+                top: '1rem',
+                right: '1rem',
+                width: '10px',
+                height: '10px',
+                borderRadius: '50%',
+                backgroundColor: getStatusColor(device.status),
+                boxShadow: `0 0 10px ${getStatusColor(device.status)}`,
+                animation: device.status === 'online' ? 'pulse 2s infinite' : 'none'
+              }} />
+
+              {/* Device Icon & Name */}
+              <div>
+                <div style={{
+                  color: '#10b981',
+                  marginBottom: '1rem',
+                  opacity: 0.9
+                }}>
+                  {getDeviceIcon(device.type)}
+                </div>
+                <h3 style={{
+                  color: '#e2e8f0',
+                  fontSize: '1.125rem',
+                  fontWeight: '500',
+                  margin: '0 0 0.5rem 0'
+                }}>{device.name}</h3>
+                <p style={{
+                  color: '#94a3b8',
+                  fontSize: '0.875rem',
+                  margin: '0 0 0.25rem 0'
+                }}>{device.ip}</p>
+                <p style={{
+                  color: '#64748b',
+                  fontSize: '0.75rem',
+                  margin: 0
+                }}>{device.lastSeen}</p>
+              </div>
+
+              {/* Storage Bar */}
+              <div style={{ marginTop: '1rem' }}>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  marginBottom: '0.25rem'
+                }}>
+                  <span style={{ color: '#94a3b8', fontSize: '0.75rem' }}>Storage</span>
+                  <span style={{ color: '#94a3b8', fontSize: '0.75rem' }}>{device.storage}</span>
+                </div>
+                <div style={{
+                  height: '4px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  borderRadius: '2px',
+                  overflow: 'hidden'
+                }}>
+                  <div style={{
+                    height: '100%',
+                    width: device.storage,
+                    backgroundColor: '#10b981',
+                    transition: 'width 0.3s ease'
+                  }} />
+                </div>
+              </div>
+
+              {/* Options Menu */}
+              <div 
+                style={{
+                  position: 'absolute',
+                  bottom: '1rem',
+                  right: '1rem',
+                  color: '#64748b',
+                  cursor: 'pointer',
+                  transition: 'color 0.2s ease'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.color = '#e2e8f0'}
+                onMouseLeave={(e) => e.currentTarget.style.color = '#64748b'}
+              >
+                <MoreVertical className="w-5 h-5" />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Floating Action Button */}
+      <div style={{
+        position: 'fixed',
+        bottom: '2rem',
+        right: '2rem',
+        zIndex: 1000
+      }}>
+        {/* Expanded Menu */}
+        <div style={{
+          position: 'absolute',
+          bottom: '70px',
+          right: 0,
+          backgroundColor: '#234940',
+          borderRadius: '12px',
+          padding: '0.75rem',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)',
+          opacity: fabExpanded ? 1 : 0,
+          visibility: fabExpanded ? 'visible' : 'hidden',
+          transform: fabExpanded ? 'translateY(0)' : 'translateY(20px)',
+          transition: 'all 0.3s ease',
+          minWidth: '180px'
+        }}>
+          <div 
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              padding: '0.75rem',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              transition: 'background-color 0.2s ease',
+              color: '#e2e8f0'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(16, 185, 129, 0.1)'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+          >
+            <HardDrive className="w-5 h-5" style={{ color: '#10b981' }} />
+            <span style={{ fontSize: '0.875rem' }}>Add Device</span>
+          </div>
+          <div 
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              padding: '0.75rem',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              transition: 'background-color 0.2s ease',
+              color: '#e2e8f0'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(16, 185, 129, 0.1)'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+          >
+            <Share2 className="w-5 h-5" style={{ color: '#10b981' }} />
+            <span style={{ fontSize: '0.875rem' }}>Share File</span>
+          </div>
+        </div>
+
+        {/* Main FAB Button */}
+        <button
+          style={{
+            width: '56px',
+            height: '56px',
+            borderRadius: '50%',
+            backgroundColor: '#10b981',
+            border: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            boxShadow: '0 4px 12px rgba(16, 185, 129, 0.4)',
+            transition: 'all 0.3s ease',
+            color: 'white'
+          }}
+          onMouseEnter={(e) => {
+            setFabExpanded(true);
+            e.currentTarget.style.transform = 'scale(1.1) rotate(45deg)';
+            e.currentTarget.style.boxShadow = '0 6px 20px rgba(16, 185, 129, 0.6)';
+          }}
+          onMouseLeave={(e) => {
+            setFabExpanded(false);
+            e.currentTarget.style.transform = 'scale(1) rotate(0deg)';
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.4)';
+          }}
+        >
+          <Plus className="w-6 h-6" />
+        </button>
+      </div>
+
+      <style jsx>{`
+        @keyframes pulse {
+          0% {
+            box-shadow: 0 0 10px currentColor;
+          }
+          50% {
+            box-shadow: 0 0 20px currentColor;
+          }
+          100% {
+            box-shadow: 0 0 10px currentColor;
+          }
+        }
+      `}</style>
+    </div>
+  );
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   return (
     <div className="vh-100 d-flex flex-column" style={{ backgroundColor: '#1a4d3a' }}>
       {/* Header - Always visible */}
@@ -644,7 +1088,7 @@ const FileListPreview = () => {
             ""
           )       
         }
-
+        
         {mainsec === "home" ?
         (
           <>
@@ -672,7 +1116,9 @@ const FileListPreview = () => {
         )
         :
         (
-          ''
+          <>
+          <SharedDevices />
+          </>
         )        
       }
         </main>
