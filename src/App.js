@@ -569,6 +569,37 @@ const SharedDevices = () => {
     }
   };
 
+
+  const addDevice = async () =>{
+    const result = null
+    try{
+      const response = await fetch("http://localhost:5000/file", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({}),
+    });
+
+    result = await response.json()
+    console.log(" result ; ",result)
+    setFabExpanded(false)
+    }
+    catch(error){
+      console.log('resul ;' , result)
+    }
+    
+  }
+
+
+  // useEffect(() => {
+  // const handleClickOutside = () => {
+  //   setContextMenu(null);
+  //   setFabExpanded(false)
+  // }
+  // window.addEventListener("click", handleClickOutside);
+  // return () => window.removeEventListener("click", handleClickOutside);
+  // }, []);
+
+  
   return (
     <div style={{
       minHeight: 'fit-content',
@@ -722,8 +753,10 @@ const SharedDevices = () => {
         position: 'fixed',
         bottom: '2rem',
         right: '2rem',
-        zIndex: 1000
-      }}>
+        zIndex: 1000,
+      }}
+      
+      >
         {/* Expanded Menu */}
         <div style={{
           position: 'absolute',
@@ -738,8 +771,9 @@ const SharedDevices = () => {
           visibility: fabExpanded ? 'visible' : 'hidden',
           transform: fabExpanded ? 'translateY(0)' : 'translateY(20px)',
           transition: 'all 0.3s ease',
-          minWidth: '180px'
-        }}>
+          minWidth: '180px',
+        }}
+        >
           <div 
             style={{
               display: 'flex',
@@ -753,6 +787,7 @@ const SharedDevices = () => {
             }}
             onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(16, 185, 129, 0.1)'}
             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+            onClick={()=>{addDevice()}}
           >
             <HardDrive className="w-5 h-5" style={{ color: '#10b981' }} />
             <span style={{ fontSize: '0.875rem' }}>Add Device</span>
@@ -792,16 +827,34 @@ const SharedDevices = () => {
             transition: 'all 0.3s ease',
             color: 'white'
           }}
-          onMouseEnter={(e) => {
-            setFabExpanded(true);
-            e.currentTarget.style.transform = 'scale(1.1) rotate(45deg)';
-            e.currentTarget.style.boxShadow = '0 6px 20px rgba(16, 185, 129, 0.6)';
+          onClick={(e)=>{
+            if(fabExpanded){
+              setFabExpanded(false);
+              e.currentTarget.style.transform = 'scale(1) rotate(0deg)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.4)';
+            }
+            else{
+              setFabExpanded(true);
+              e.currentTarget.style.transform = 'scale(1.1) rotate(45deg)';
+              e.currentTarget.style.boxShadow = '0 6px 20px rgba(16, 185, 129, 0.6)';
           }}
-          onMouseLeave={(e) => {
-            setFabExpanded(false);
-            e.currentTarget.style.transform = 'scale(1) rotate(0deg)';
-            e.currentTarget.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.4)';
-          }}
+            }
+            
+          // onMouseEnter={(e) => {
+          //   setFabExpanded(true);
+          //   e.currentTarget.style.transform = 'scale(1.1) rotate(45deg)';
+          //   e.currentTarget.style.boxShadow = '0 6px 20px rgba(16, 185, 129, 0.6)';
+          // }}
+          // onMouseDown={(e)=>{
+          //   setFabExpanded(true);
+          //   e.currentTarget.style.transform = 'scale(1.1) rotate(45deg)';
+          //   e.currentTarget.style.boxShadow = '0 6px 20px rgba(16, 185, 129, 0.6)';
+          // }}
+          // onMouseLeave={(e) => {
+          //   setFabExpanded(false);
+          //   e.currentTarget.style.transform = 'scale(1) rotate(0deg)';
+          //   e.currentTarget.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.4)';
+          // }}
         >
           <Plus className="w-6 h-6" />
         </button>
